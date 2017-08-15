@@ -1,0 +1,16 @@
+=======================HROTHGAR PARALLEL MINIMIZER=======================
+
+Copyright (C) 2007-2012 Andisheh Mahdavi. Copying and distribution of
+this README, with or without modification, are permitted in any medium
+without royalty provided the copyright notice and this notice are
+preserved.
+
+This package contains Hrothgar, a generic Levenberg-Marquardt
+minimizer and Markov Chain Monte Carlo generator that is well suited
+to complicated multidimensional problems.  The contact is
+Andisheh Mahdavi (andisheh.mahdavi@gmail.com).
+
+For specific installation instructions see hrothgar.pdf. For general
+instruction for using the GNU auto tools, please read the INSTALL file
+included in this distribution.
+

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if which mpirun &> /dev/null; then
+   mpirun -np 9 -mca btl tcp,self jaco $*
+elif which openmpirun &> /dev/null; then
+   openmpirun -np 9 -mca btl tcp,self jaco $*
+else
+   echo No mpirun or alternative found in path
+fi

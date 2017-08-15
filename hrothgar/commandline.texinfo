@@ -1,0 +1,148 @@
+The default values of the command line parameters may be seen by
+specifying @w{@code{--help [parameter]}} on the command line.
+
+@code{-C, --conf} @var{level}
+@quotation
+Specify confidence level at which 1D errors are reported.
+@end quotation
+
+@code{-D, --defaults} 
+@quotation
+Run without any configuration files, using internal default parameters.
+If the configuration files are specified, -D does nothing.
+@end quotation
+
+@code{-E, --evalonly}
+@quotation
+Evaluate the merit function at the initial vector and quit---do not
+carry out any fitting or error analysis.
+@end quotation
+
+@code{-H, --hardlimits}
+@quotation
+Ignore the limits set in the input parameter file; use hard
+limits on the parameter values as specified by the calling 
+program.
+@end quotation
+
+@code{-L, --license}
+@quotation
+Display the terms for copying, modifying and redistributing
+this program.
+@end quotation
+
+@code{-R, --remember}
+@quotation
+Normally, if the user modifies the fit/frozen state of parameters via
+the @w{@code{--parameter}} command line option, the new state is
+recorded in the output file. With @w{@code{--remember}}, the old state
+is recorded instead. This is useful in conjunction with the @code{%}
+modifier to @w{@code{--parameter}}.
+@end quotation
+
+@code{-S, --seed} @var{number}
+@quotation
+The random number seed is normally read from /dev/random.
+This uses the user specified value instead. Random numbers
+are used in the Tree MCMC mode, as well as in the uphill
+steps taken using the @w{@code{--floataround}} option.
+Implies @w{@code{--predictable}} in Tree MCMC mode.
+@end quotation
+
+@code{-X, --overwrite}
+@quotation
+Overwrite all existing files, rather than exiting with
+an error condition.
+@end quotation
+
+@code{-a, --inputaccuracy} @var{eps}
+@quotation
+Specify the fractional accuracy of the fitting function
+provided by the calling program. This is used in estimating
+the error on the numerical derivatives.
+@end quotation
+
+@code{-c, --covaronly}
+@quotation
+Do not conduct minimization. If the covariance matrix exists on the disk
+already, read it in and use it to output confidence contours.
+If not, or if @w{@code{--ignorecovar}} is specified, calculate the
+covariance matrix using the initial conditions.
+@end quotation
+
+@code{-d, --dumpconfig}
+@quotation
+Write the default configuration file to standard output.
+@end quotation
+
+@code{-e, --eps} @var{eps}
+@quotation
+Specify the fractional tolerance for convergence.
+@end quotation
+
+@code{-g, --gaussstep} @var{[sigma]}
+@quotation
+For MCMC mode only. Initial sigma of Gaussian by which to step the
+parameters fractionally.
+@end quotation
+
+@code{-h, --help} @var{[parameters]}
+@quotation
+Summarize the available options. If @w{@var{parameters}} are specified,
+show their default value.
+@end quotation
+
+@code{-m, --mcmc} @var{number}
+@quotation
+Do not minimize. Instead, generate a Tree Markov Chain Monte Carlo
+Chain of length @w{@var{number}}.
+@end quotation
+
+@code{-p, --parameter} @var{name}[%=~@@][@var{value}]
+@quotation
+This powerful option allows manipulation of the fit or frozen
+parameters, and may be specified as many times as needed.
+The parameter @w{@var{name}} is selected. The operator @samp{@@}
+freezes it at @w{@var{value}}, or at its initial value if
+@w{@var{value}} is not specified. The operator @samp{~} does
+the opposite: it causes @w{@var{name}} to be fit, starting 
+with @w{@var{value}}, or with its initial value if @w{@var{value}}
+is not specified. The operators @samp{=} respects the initial
+fit/frozen state of @w{@var{name}}, but sets its initial
+value to @w{@var{value}}. Finally, the @samp{%} operator 
+causes @var{name} to be fit, but freezes all other parameters
+not previously modified by @samp{%}.
+
+Examples:
+
+@code{-p slope=2} sets @var{slope} to 2, but does not change its
+fit/frozen status
+
+@code{-p slope~} causes @var{slope} to be fit starting at its 
+initial value, even if it was frozen by default
+
+@code{-p slope@@3} freezes @var{slope} at the value 3.
+
+@code{-p slope%2 -p intercept%} freezes all parameters except
+@w{@var{slope}} and @w{@var{intercept}}; @w{@var{slope}} is fit
+with an initial value of 2, while @w{@var{intercept}} is fit
+starting at its default initial value.
+@end quotation
+
+@code{-q, --quiet} 
+@quotation
+Try to output as little text as possible.
+@end quotation
+
+@code{-t, --timer} 
+@quotation
+Measure Hrothgar's performance (the time it takes for each
+Levenberg-Marquardt step). Works with the clustered as well
+as the single CPU modes.
+@end quotation
+
+@code{-v, --verbose} 
+@quotation
+Show lots of diagnostic output.
+@end quotation
+

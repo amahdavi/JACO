@@ -1,0 +1,97 @@
+#!/bin/bash
+
+runjaco=1
+if [ f$1 == f-p ]; then
+  cfg="$2" && shift && shift
+else
+  cfg=`basename $1 | sed 's/.cfg/ng.cfg/g'`
+fi
+
+dn=`dirname $1`
+cn=`echo $PWD | awk -v FS="[/_]" '{ print $(NF) }'`
+
+cd $dn
+bn=`basename $1`
+tn=`basename $1 | sed 's/.cfg//g'`
+echo hi
+
+#[ ! -e $cfg ] && exit
+#[ `tail -1 $cfg | awk '{ print $1=="#" && NF == 5 }'` == 0 ] && exit
+
+df=`grep xraydata $bn | awk '{ print $2}'`
+na=`awk '{ print $2, $3}' $df | sort | uniq | wc -l`
+nna=$(($na-1))
+
+args=
+for n in `seq -f '%03g' 0 $nna`; do
+  for g in T Z n; do
+    unlocked=`awk -v vf=$g$n '$3 == 0 && $1 == vf' $cfg | awk '{ print $1}'`
+    if [ f$unlocked = f ]; then
+       unlocked=$oldunlocked
+    else
+       unlocked=$n
+    fi
+    args="$args $g$unlocked"
+    if [ $g != n ]; then
+       oldunlocked=$unlocked
+    fi
+  done
+done
+echo $args > args.txt
+
+f1=`mktemp /tmp/tmp.XXXXXXX`        
+f2=`mktemp /tmp/tmp.XXXXXXX`
+f3=`mktemp /tmp/tmp.XXXXXXX`
+mcmcprob `find . -name "$bn.0[1-9].mcmc"` -r 5000 `seq -f 'prof[0-z]*%03g' 0 $nna` > $f3
+echo \# 01T 03Z 05N `sed 's/[0-9]*//g' $f3 | awk '{ printf("%02d%s ",a+7,substr($1,5,100)); a += 2-($1 ~ "Reff"); if ($1 ~ "Mtot") exit }'` > $bn-mixed.prof
+awk '{ printf $2" "; if ($1 !~ "Reff") printf $3" "; if ($1 ~ "Mtot") printf "\n"; }' $f3 > $f2
+mcmcprob `find . -name "$bn.0[1-9].mcmc"` -d 5000 rDelta | awk '{ if (NR % 2 == 0) print $2, $3; else printf $2"    ";}' > $bn-xrayradii.txt 
+mcmcprob `find . -name "$cfg.0[1-9].mcmc"` -d 5000 $args | awk '{ printf $2" "$3" "; if (NR % 3 == 0) printf "\n"}' > $f1
+
+r500=`awk '$1 == 500' $bn-xrayradii.txt | awk '{ print $2}'`
+paste $f1 $f2 >> $bn-mixed.prof
+
+grep -v \# $bn-mixed.prof > $f3
+awk '{ print $7, $1, $2, $18, $19}' $f3  > $bn-mixed-T.prof
+awk '{ print $7, $3, $4, $32, $33}' $f3 > $bn-mixed-Z.prof
+awk '{ print $7, a=10**$5, log(10.)*$6*a, $20,$21}' $f3 > $bn-mixed-n.prof
+awk '{ print $7, a=$1/(10**$5)**(2./3), a*sqrt(($2/$1)**2+(log(10)*$6)**2), $24, $25 }' $f3 > $bn-mixed-S.prof
+awk '{ print $7, a=(1.6e-9)*$1*(10**$5), a*sqrt(($2/$1)**2+(log(10)*$6)**2), $22,$23 }' $f3 > $bn-mixed-p.prof
+awk '{ print $7, 0.5*($27+$26), 0.5*($27-$26) }' $f3 > $bn-mixed-c.prof
+
+for f in  $bn-mixed-?.prof ; do
+
+   awk '{ print $1/'$r500',$2,$3,$4,$5}' $f > r500-$f
+
+done
+
+smdir=`which sm | sed 's+bin+share+g'`
+
+  sm -m $smdir/qplot.sm 1 $bn-mixed-T.prof 'r\,(Mpc)' 'T\,(keV)' $cn t.eps
+  sm -m $smdir/qplot.sm 1 $bn-mixed-Z.prof 'r\,(Mpc)' 'Z\,(Z_\odot)' $cn z.eps
+  sm -m $smdir/qplot.sm 1 $bn-mixed-n.prof 'r\,(Mpc)' 'n_e\,(cm^{-3})' $cn n.eps
+  sm -m $smdir/qplot.sm 1 $bn-mixed-S.prof 'r\,(Mpc)' 'S\,(keV\,cm^2)' $cn s.eps
+  sm -m $smdir/qplot.sm 1 $bn-mixed-p.prof 'r/r_{500}' 'p\,(ergs\,cm^{-3})' $cn p.eps
+  sm -m $smdir/qplot.sm 2 $bn-mixed-c.prof 'r\,(Mpc)' 't_{cool}\,(Gyr)' $cn c.eps
+
+
+  sm -m $smdir/qplot.sm 1 r500-$bn-mixed-T.prof r/r_{500} 'T\,(keV)' $cn t-r500.eps
+  sm -m $smdir/qplot.sm 1 r500-$bn-mixed-Z.prof r/r_{500} 'Z\,(Z_\odot)' $cn z-r500.eps
+  sm -m $smdir/qplot.sm 1 r500-$bn-mixed-n.prof r/r_{500} 'n_H\,(cm^{-3})' $cn n-r500.eps
+  sm -m $smdir/qplot.sm 1 r500-$bn-mixed-S.prof r/r_{500} 'S\,(keV\,cm^2)' $cn s-r500.eps
+  sm -m $smdir/qplot.sm 1 r500-$bn-mixed-p.prof r/r_{500} 'p\,(ergs\,cm^{-3})' $cn p-r500.eps
+  sm -m $smdir/qplot.sm 2 r500-$bn-mixed-c.prof r/r_{500} 't_{cool}\,(Gyr)' $cn c-r500.eps
+
+
+for f in "" -r500; do
+  epstopdf t$f.eps 
+  epstopdf n$f.eps
+  epstopdf s$f.eps
+  epstopdf z$f.eps
+  epstopdf p$f.eps
+  epstopdf c$f.eps
+
+  pdfjoin n$f.pdf t$f.pdf s$f.pdf z$f.pdf p$f.pdf c$f.pdf --outfile joined.pdf
+  pdfnup --nup 3x2 joined.pdf --outfile $bn-mixed$f.pdf
+done
+

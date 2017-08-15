@@ -1,0 +1,14 @@
+================SCIUTILS SCIENTIFIC COMPUTING LIBRARY====================
+
+Copyright (C) 2007-2012 Andisheh Mahdavi. Copying and distribution of this
+README, with or without modification, are permitted in any medium
+without royalty provided the copyright notice and this notice are
+preserved.
+
+This package contains the SCIUTILS library, a collection of
+miscellaneous utilities useful for scientific (specifically
+X-ray astronomical) computing in C.  
+
+For specific installation instructions see sciutils.pdf. For general
+instruction for using the GNU auto tools, please read the INSTALL file
+included in this distribution.

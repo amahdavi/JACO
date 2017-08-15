@@ -1,0 +1,33 @@
+#!/bin/bash
+
+evince=echo
+[ f$3 != f ] && evince=$3 && shift
+
+while [ f$1 != f ]; do
+pushd . 
+cd `dirname $1`
+bn=`basename $1`
+jaco -XE $bn /tmp/$bn -p write=1
+sf=`grep xraydata $bn | awk '{ print $2}'`
+rat=`grep Ratio /tmp/$bn | head -1 |  awk '{ if (1.*$9 > 5.) print 0; else print 1.*$9 }'`
+if [ $rat = 0 ]; then
+   popd
+   echo ------------- Skipping $bn $rat ----------------
+   echo $bn >> badlist.txt
+else
+echo ------------- Running $bn $rat ----------------
+#rcut=`awk '{ if ($1 == "Rcut") print $2}' $bn`
+#[ f$2 != f ] && grep $2 $sf > fitspec.$2 && sf=fitspec.$2
+rcut=0
+awk -v rr=$rcut '$3 > rr' $sf > fitspec.specplot
+smdir=`which sm | sed s+bin+share+g`
+sm -m $smdir/specplot.sm fitspec.specplot 1.3 $bn-Ratio:$rat 
+ps2epsi specplot.eps $bn.eps
+rm specplot.eps
+epstopdf $bn.eps &
+#$evince $bn.pdf &
+popd
+fi
+
+shift
+done
