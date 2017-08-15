@@ -26,3 +26,17 @@ If you do not have administrative privileges, you can install on your home folde
 `./configure --with-bolocam --prefix=$HOME`
 `make -j 4`
 `make install`
+
+## Incorporating Seth Siegel's changes
+
+The following files were changed by Seth Siegel, but the differences are too complicated to be managed by GitHub's automatic merge system. Whoever incorporates the changes in these files into the main code should grab relevant portions bookended by ``//Siegel Begin`` and ``//Siegel End`` and manually merge them into the main folder.
+
+```
+hrothgar/sciutils/readxray_SETH.c
+hrothgar/hrothgar_SETH.c
+jaco_SETH.c
+jaco_SETH.h
+sherpa_SETH.c
+standalone_SETH.c
+standalone_SETH.h
+```
