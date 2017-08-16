@@ -18,14 +18,18 @@ On other Linux systems, use the native package managers (such as `yum`) to insta
 ## Installation
 
 To install in the system directory (with administrator access), type
-`./configure --with-bolocam`
-`make -j 4`
-`sudo make install`
+```
+./configure --with-bolocam
+make -j 4
+sudo make install
+```
 
 If you do not have administrative privileges, you can install on your home folder:
-`./configure --with-bolocam --prefix=$HOME`
-`make -j 4`
-`make install`
+```
+./configure --with-bolocam --prefix=$HOME`
+make -j 4
+make install
+```
 
 ## Incorporating Seth Siegel's changes
 
